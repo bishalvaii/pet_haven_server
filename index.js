@@ -19,10 +19,10 @@ const otpGenerator = require('otp-generator');
 
 // Create a pool to manage database connections
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'pet_haven',
-  password: 'admin',
+  user: 'my_db_0vlk_user',
+  host: 'dpg-coek6d0l5elc738aie50-a',
+  database: 'my_db_0vlk',
+  password: 'UKiyi0bKTJNtkXiwy9etgvGJV6L9F72x',
   port: 5432, // Default PostgreSQL port
 });
 
@@ -468,7 +468,7 @@ app.get('/rescue-reports', async(req, res) => {
     
   
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
