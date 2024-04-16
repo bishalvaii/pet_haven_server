@@ -392,7 +392,9 @@ app.get('/total-income', async (req, res) => {
     res.status(500).json({ error: 'Error fetching total income' });
   }
 });
-
+app.get('/check', async (req, res) => {
+  res.send('Hiii');
+});
 // Route to fetch reports data
 app.get('/adoption-reports', async (req, res) => {
   try {
