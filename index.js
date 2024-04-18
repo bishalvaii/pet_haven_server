@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const cors = require('cors')
 const multer = require('multer');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const app = express();
@@ -19,14 +20,12 @@ const otpGenerator = require('otp-generator');
 
 // Create a pool to manage database connections
 const pool = new Pool({
-  user: 'my_db_0vlk_user',
-  host: 'dpg-coek6d0l5elc738aie50-a',
-  database: 'my_db_0vlk',
-  password: 'UKiyi0bKTJNtkXiwy9etgvGJV6L9F72x',
+  user: 'postgres',
+  host: 'localhost',
+  database: 'pet_haven',
+  password: 'admin',
   port: 5432, // Default PostgreSQL port
-  ssl: {
-    rejectUnauthorized: false // Required for Render PostgreSQL connections
-  }
+  
 });
 
 //create a nodemailer using smtp transport
@@ -145,7 +144,15 @@ app.post('/api/login', async (req, res) => {
   
       // If a matching user is found, return a success response
       if (result.rows.length > 0) {
-        res.status(200).json({ message: 'Login successful' });
+        const payload = {
+          username: result.rows[0].username,
+          isAdmin: result.rows[0].isadmin // Include additional user info as needed
+        };
+  
+        // Generate JWT token with a secret key and expiration time (e.g., 1 hour)
+        const token = jwt.sign(payload, 'your_secret_key', { expiresIn: '1h' });
+  
+        res.status(200).json({ message: 'Login successful', token: token });
       } else {
         // If no matching user is found, return an error response
         res.status(401).json({ error: 'Invalid email or password' });
