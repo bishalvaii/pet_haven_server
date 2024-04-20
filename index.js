@@ -398,7 +398,7 @@ app.post('/admin/add-adoption', upload.single('image'), async (req, res) => {
 app.put('/admin/edit-adoption/:adoptionId', async (req, res) => {
   try {
     const adoptionId = req.params.adoptionId;
-    const { username, dogName, location, description, age, gender, phoneNumber, price } = req.body;
+    const { username, dogName, location, description, age, gender,  price } = req.body;
 
     // Validate adoptionId to prevent SQL injection
     if (!adoptionId.match(/^\d+$/)) {
@@ -408,12 +408,12 @@ app.put('/admin/edit-adoption/:adoptionId', async (req, res) => {
     // Update adoption details in the database
     const query = `
       UPDATE adoptions
-      SET username = $1, dog_name = $2, location = $3, description = $4, age = $5, gender = $6, phone_number = $7, price = $8
-      WHERE id = $9
+      SET username = $1, dog_name = $2, location = $3, description = $4, dog_age = $5, gender = $6, price = $7
+      WHERE id = $8
       RETURNING *;
     `;
 
-    const values = [username, dogName, location, description, age, gender, phoneNumber, price, adoptionId];
+    const values = [username, dogName, location, description, age, gender, price, adoptionId];
     const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
