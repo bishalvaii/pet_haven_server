@@ -34,8 +34,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "vishaladhikari1738@gmail.com",
-    pass: 'vmhs nmwl hxbw csbt'
+    user: "yurisha.acharya.a21.2@icp.edu.np",
+    pass: 'rdtj bjan dszz ddvs'
   },
   debug: true
 
@@ -76,7 +76,7 @@ app.post('/api/signup', async (req, res) => {
 
     // send otp code to the user via emai
     const mailOptions = {
-      from: 'vishaladhikari1738@gmail.com',
+      from: 'yurisha.acharya.a21.2@icp.edu.np',
       to: email,
       subject: 'OTP Verification',
       text: `Your OTP code is: ${otpCode}`,
@@ -370,6 +370,53 @@ app.post('/adoption', async (req, res) => {
   }
 });
 
+app.post('/user-adoptions', async (req, res) => {
+  const { username, dog_name, dog_age, gender, description, price } = req.body;
+
+  try {
+    // Insert adoption details into user_adoptions table
+    const adoptionResult = await pool.query(
+      'INSERT INTO user_adoptions (username, dog_name, dog_age, gender, description, price) VALUES ($1, $2, $3, $4, $5, $6)',
+      [username, dog_name, dog_age, gender, description, price]
+    );
+
+    if (adoptionResult.rowCount > 0) {
+      console.log('Adoption details stored successfully:', adoptionResult.rows[0]);
+      res.status(200).send('Adoption details stored successfully.');
+    } else {
+      console.error('Failed to store adoption details:', adoptionResult);
+      res.status(401).json({ error: 'Sorry, unable to store adoption details' });
+    }
+  } catch (error) {
+    console.error('Error storing adoption details:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+app.post('/user-rescues', async (req, res) => {
+  const { username, name, age, gender, description } = req.body;
+
+  try {
+    // Insert adoption details into user_adoptions table
+    const rescueResult = await pool.query(
+      'INSERT INTO user_rescues (username, dog_name, dog_age, gender, description) VALUES ($1, $2, $3, $4, $5)',
+      [username, name, age, gender, description]
+    );
+
+    if (rescueResult.rowCount > 0) {
+      console.log('Rescue details stored successfully:', rescueResult.rows[0]);
+      res.status(200).send('Rescue details stored successfully.');
+    } else {
+      console.error('Failed to store rescue details:', rescueResult);
+      res.status(401).json({ error: 'Sorry, unable to store rescue details' });
+    }
+  } catch (error) {
+    console.error('Error storing rescue details:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
 app.post('/admin/add-adoption', upload.single('image'), async (req, res) => {
   try {
     const { username, dogName, location, description, dog_age, gender, price } = req.body;
@@ -404,17 +451,18 @@ app.put('/admin/edit-adoption/:adoptionId', async (req, res) => {
     if (!adoptionId.match(/^\d+$/)) {
       return res.status(400).json({ success: false, error: 'Invalid adoption ID' });
     }
-
+    const dog_image = req.file ? `/images/${req.file.filename}` : '';
     // Update adoption details in the database
     const query = `
       UPDATE adoptions
-      SET username = $1, dog_name = $2, location = $3, description = $4, dog_age = $5, gender = $6, price = $7
-      WHERE id = $8
+      SET username = $1, dog_name = $2, location = $3, description = $4, dog_age = $5, gender = $6, price = $7, dog_image = $8
+      WHERE id = $9
       RETURNING *;
     `;
 
-    const values = [username, dogName, location, description, age, gender, price, adoptionId];
+    const values = [username, dogName, location, description, age, gender, price, dog_image, adoptionId];
     const result = await pool.query(query, values);
+    console.log(result)
 
     if (result.rows.length === 0) {
       // Adoption with the provided ID doesn't exist
